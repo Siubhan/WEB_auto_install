@@ -12,17 +12,33 @@ init_db = '''
     CREATE TABLE specialist(
         specialist_id INTEGER PRIMARY KEY AUTOINCREMENT,
         fullname VARCHAR(100),
-        phone VARCHAR(11) UNIQUE,
+        phone VARCHAR(11) UNIQUE
+    );
+    
+    DROP TABLE IF EXISTS box;
+    CREATE TABLE box(
+        box_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        specialist_id INTEGER,
+        address VARCHAR(150),
+        FOREIGN KEY (specialist_id)  REFERENCES specialist(specialist_id) ON DELETE CASCADE
+    );
+    
+    DROP TABLE IF EXISTS type_device;
+    CREATE TABLE type_device(
+        type_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name VARCHAR(100),
         price_mount DECIMAL(9,2)
     );
     
     DROP TABLE IF EXISTS devices;
     CREATE TABLE devices(
         device_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type_id INTEGER,
         name VARCHAR(100),
         price DECIMAL(9,2),
         availble INTEGER,
-        producer VARCHAR(30)
+        producer VARCHAR(30),
+        FOREIGN KEY (type_id)  REFERENCES type_device(type_id) ON DELETE CASCADE
     );
     
     DROP TABLE IF EXISTS equipment;
@@ -35,25 +51,44 @@ init_db = '''
         FOREIGN KEY (device_id)  REFERENCES devices(device_id) ON DELETE CASCADE,
         FOREIGN KEY (mount_id)  REFERENCES mount(mount_id) ON DELETE CASCADE
     );
+
+    DROP TABLE IF EXISTS status;
+    CREATE TABLE status(
+        status_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        name VARCHAR(80)
+    );
+    
+    DROP TABLE IF EXISTS history_mount;
+    CREATE TABLE history_mount(
+        history_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        mount_id INTEGER,
+        status_id INTEGER,
+        time_update TIME,
+        FOREIGN KEY (mount_id)  REFERENCES mount(mount_id) ON DELETE CASCADE,
+        FOREIGN KEY (status_id)  REFERENCES status(status_id) ON DELETE CASCADE
+    );
     
     DROP TABLE IF EXISTS mount;
     CREATE TABLE mount(
         mount_id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        specialist_id INTEGER,
         client_id INTEGER,
-        date_mount DATE,
+        schedule_id INT,
+        car_model VARCHAR(80),
         time_mount TIME,
-        FOREIGN KEY (specialist_id, date_mount, time_mount)  REFERENCES spec_schedule(specialist_id, date_mount, time_mount) ON DELETE CASCADE,
+        date_mount TIME,
+        status_id INTEGER,
+        FOREIGN KEY (status_id)  REFERENCES status(status_id) ON DELETE CASCADE,
+        FOREIGN KEY (schedule_id)  REFERENCES work_schedule(schedule_id) ON DELETE CASCADE,
         FOREIGN KEY (client_id)  REFERENCES client(client_id) ON DELETE CASCADE
     );
     
-    DROP TABLE IF EXISTS spec_schedule;
-    CREATE TABLE spec_schedule(
-    specialist_id INTEGER,
+    DROP TABLE IF EXISTS work_schedule;
+    CREATE TABLE work_schedule(
+    schedule_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    box_id INTEGER,
     date_mount DATE,
-    time_mount TIME,
-    is_free BOOLEAN,
-    CONSTRAINT PK_SCHEDULE PRIMARY KEY (specialist_id, date_mount, time_mount),
-    FOREIGN KEY (specialist_id)  REFERENCES specialist(specialist_id) ON DELETE CASCADE
+    hour_work_from INTEGER,
+    hour_work_to INTEGER,
+    FOREIGN KEY (box_id)  REFERENCES box(box_id) ON DELETE CASCADE
     );
 '''
