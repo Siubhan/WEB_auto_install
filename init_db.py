@@ -8,6 +8,30 @@ init_db = '''
         discount INTEGER DEFAULT 0
     );
     
+    DROP TABLE IF EXISTS client_cars;
+    CREATE TABLE client_cars(
+        client_car_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id INTEGER,
+        model_id INTEGER,
+        FOREIGN KEY (client_id)  REFERENCES client(client_id) ON DELETE CASCADE,
+        FOREIGN KEY (model_id)  REFERENCES car_models(model_id) ON DELETE CASCADE        
+    );
+        
+    DROP TABLE IF EXISTS car_brands;
+    CREATE TABLE car_brands(
+        brand_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        brand_name VARCHAR(100)
+        );
+    
+    DROP TABLE IF EXISTS car_models;
+    CREATE TABLE car_models(
+        model_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        brand_id INTEGER,
+        model_name VARCHAR(100),
+        model_year INTEGER,
+        FOREIGN KEY (brand_id)  REFERENCES car_brands(brand_id) ON DELETE CASCADE
+    );
+    
     DROP TABLE IF EXISTS specialist;
     CREATE TABLE specialist(
         specialist_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,22 +88,20 @@ init_db = '''
         mount_id INTEGER,
         status_id INTEGER,
         time_update TIME,
-        FOREIGN KEY (mount_id)  REFERENCES mount(mount_id) ON DELETE CASCADE,
-        FOREIGN KEY (status_id)  REFERENCES status(status_id) ON DELETE CASCADE
+        FOREIGN KEY (mount_id)  REFERENCES mount(mount_id) ON DELETE CASCADE
     );
     
     DROP TABLE IF EXISTS mount;
     CREATE TABLE mount(
         mount_id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        client_id INTEGER,
+        client_car_id INTEGER,
         schedule_id INT,
-        car_model VARCHAR(80),
         time_mount TIME,
         date_mount TIME,
         status_id INTEGER,
-        FOREIGN KEY (status_id)  REFERENCES status(status_id) ON DELETE CASCADE,
+        FOREIGN KEY (status_id) REFERENCES status(status_id) ON DELETE CASCADE,
         FOREIGN KEY (schedule_id)  REFERENCES work_schedule(schedule_id) ON DELETE CASCADE,
-        FOREIGN KEY (client_id)  REFERENCES client(client_id) ON DELETE CASCADE
+        FOREIGN KEY (client_car_id)  REFERENCES client_cars(client_car_id) ON DELETE CASCADE
     );
     
     DROP TABLE IF EXISTS work_schedule;
