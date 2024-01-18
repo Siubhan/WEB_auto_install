@@ -83,8 +83,8 @@ _Рисунок 2. Логическая модель ПрО «Установка
 реализованные в виде реляционных таблиц. Ниже приведены SQL-запросы для их создания,
 в Приложении А приведено наполнение таблиц базы данных.
 
-[Представлена в init_db.py](https://github.com/Siubhan/WEB_auto_install/blob/master/init_db.py)
+[Представлена в init_db.py](https://github.com/Siubhan/WEB_auto_install/blob/master/db_inits/init_db.py)
 
 
 ## ПРИЛОЖЕНИЕ A. Наполнение таблиц базы данных
-[Представлено в fill_db.py](https://github.com/Siubhan/WEB_auto_install/blob/master/fill_db.py)
+[Представлено в fill_db.py](https://github.com/Siubhan/WEB_auto_install/blob/master/db_inits/fill_db.py)
