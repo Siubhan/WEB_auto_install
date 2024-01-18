@@ -29,7 +29,8 @@
     <div class="row"><h5>{{row["schedule_date"]}}</h5></div>
     {% for i, sched in schedule.iterrows() if sched["schedule_date"] == row["schedule_date"] %}
     <div class="row">
-        <button class="btn btn-outline-secondary mb-1" {{'disabled' if sched['is_free']==0 else '' }}>
+        <button id="{{sched['schedule_id']}}" class="btn btn-outline-secondary mb-1" {{'disabled' if sched['is_free']==0 else '' }}
+        onclick="selectTime({{sched['schedule_id']}})">
             {{sched["work_hour"]}}
         </button>
     </div>
@@ -73,7 +74,10 @@
 
 {% block script %}
 <script>
-
+    function selectTime(buttonId) {
+        // ! ЗАПИСЬ НА УСТАНОВКУ
+        console.log(buttonId);
+    }
 
 </script>
 {% endblock %}

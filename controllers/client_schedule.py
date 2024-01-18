@@ -11,6 +11,7 @@ def set_schedule():
 
     if request.method == 'POST':
         session['data'] = request.json
+        # ! посчитать общее время на установку
         print(session['data'])
 
     if request.values.get('fullname'):

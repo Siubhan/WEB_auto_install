@@ -63,7 +63,6 @@ def create_schedule(conn):
     cur.close()
 
 
-
 def init_schedule(conn):
     # 0 - mon, 1 - tue, 2 - wen, 3 - thur ...
     if datetime.today().weekday() == 6:
@@ -72,6 +71,9 @@ def init_schedule(conn):
 
 def edit_schedule(conn):
     cur = conn.cursor()
+
+    # ! ПОЧЕМУ-ТО SQLITE ДУМАЕТ, ЧТО ДЕНЬ ПРЕДЫДУЩИЙ
+    # ! Проблема в часовых поясах?
 
     update_work = f'''
         UPDATE work_schedule
