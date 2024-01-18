@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}
+Записи
+{% endblock %}
+
+{% macro render_table(relation, titles) %}
+<thead>
+<tr>
+    {% for name in titles %}
+    <th>{{name}}</th>
+    {% endfor %}
+</tr>
+</thead>
+<tbody>
+
+{% for key,value in relation.iterrows() %}
+<tr>
+    <td>
+        {{ value['devices'] }}
+    </td>
+        <td>
+        {{ value['status'] }}
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+{% endmacro %}
+
+
+<!-- Макрос выпадающего списка  -->
+{% macro render_combo_box(box, header, needed_id, naming, field) %}
+<div class="col-5">
+    <form action="" method="get">
+        {{header}}
+        <select name="{{field}}">
+            {% for i, row in box.iterrows() %}
+            <option value={{row[field]}} {{
+            "selected" if row[field]==needed_id else "" }}>
+            {{row[naming]}}</option>
+            {% endfor %}
+        </select>
+        <input class="btn btn-secondary" type="submit" value="Найти" name=
+                "{{naming}}">
+    </form>
+</div>
+{% endmacro %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href={{url_for('index')}}>Каталог</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('set_schedule')}}">Установка</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{url_for('set_install')}}">Записи</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row row-cols-auto">
+    <div class="col-*"></div>
+    <div class="col-8">
+        <h2>Установки</h2>
+        {{ render_combo_box(combo_box,"Клиент:", client_id, "fullname", "client_id") }}
+
+        <table class="table table-striped">
+        </table>
+
+        <h2>Статус онлайн-покупок</h2>
+        <table class="table table-striped">
+            {{render_table(purcases,title_purcases)}}
+        </table>
+    </div>
+    <div class="col-*"></div>
+</div>
+
+{% endblock %}
+{% block script %}
+
+{% endblock %}

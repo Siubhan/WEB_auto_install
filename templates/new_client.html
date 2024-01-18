@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+Новый клиент
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href={{url_for('index')}}>Каталог</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('set_schedule')}}">Установка</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('set_install')}}">Записи</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col">
+        <form action="{{url_for('new_client_post')}}" method="post">
+            <label>
+                ФИО клиента:
+                <input type="text" name="client_name">
+            </label>
+            <label>
+                Номер телефона:
+                <input type="tel" name="client_phone" onkeydown="return validate(event)">
+            </label>
+            <label>
+                Является партнером?:
+                <input type="checkbox" name="client_partner">
+            </label>
+            <input class="btn btn-secondary" type="submit" value="Добавить клиента">
+            <a class="btn btn-secondary" href="{{url_for('index')}}">Отменить</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function validate(e) {
+        let charCode = e.keyCode ? e.keyCode : e.charCode
+        if (!(charCode >= 48 && charCode <= 57)) {
+            if (!(charCode >= 37 && charCode <= 40))
+                if (charCode != 8 && charCode != 46)
+                    return false;
+        }
+    }
+</script>
+{% endblock %}

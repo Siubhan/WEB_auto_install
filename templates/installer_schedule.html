@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}
+График установщика
+{% endblock %}
+
+
+{% macro render_table(relation, titles) %}
+
+{% set n = len(relation) %}
+<thead>
+<tr>
+    {% for name in titles %}
+    <th>{{name}}</th>
+    {% endfor %}
+</tr>
+</thead>
+<tbody>
+{% for i in range(n) %}
+<tr>
+    {% for name in relation.dtypes.index %}
+    <td>
+        {{ relation.loc[i, name] }}
+    </td>
+    {% endfor %}
+</tr>
+{% endfor %}
+</tbody>
+{% endmacro %}
+
+{% macro render_combo_box(box, header, needed_id, naming, field) %}
+<div class="col-5">
+    <form action="" method="get">
+        {{header}}
+        <select name="{{field}}">
+            {% for i, row in box.iterrows() %}
+            <option value={{row[field]}} {{
+            "selected" if row[field]==needed_id else "" }}>
+            {{row[naming]}}</option>
+            {% endfor %}
+        </select>
+        <input class="btn btn-secondary" type="submit" value="Найти" name=
+                "{{naming}}">
+    </form>
+</div>
+{% endmacro %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{url_for('show_schedule')}}">График</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('sell_items')}}">Выдача</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    {{ render_combo_box(boxes,"Боксы:", 1, "address", "box_id") }}
+</div>
+<div class="row">
+
+</div>
+{% endblock %}

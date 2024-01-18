@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}
+Каталог
+{% endblock %}
+
+<!-- Макрос выпадающего списка клиентов -->
+{% macro render_combo_box(box, header, needed_id, naming) %}
+<p>
+<form action="" method="get">
+    {{header}}
+    <select name="client_id">
+        {% for i, row in box.iterrows() %}
+        <option value={{row["client_id"]}} {{
+        "selected" if row["client_id"]==needed_id else "" }}>
+        {{row["fullname"]}}</option>
+        {% endfor %}
+    </select>
+    <input class="btn btn-secondary" type="submit" value="Найти" name=
+            "client">
+</form>
+</p>
+{% endmacro %}
+
+<!-- Макрос каталога -->
+{% macro render_catalog(catalog, header) %}
+{% for i, rows in catalog.iterrows() %}
+<div class="catalog-item card g-0" id="card{{i}}">
+    <div class="card-body">
+        {% for row in rows %}
+        <p class="card-text">{{header[loop.index-1]}}: {{ row }}</p>
+        {% endfor %}
+        <p class="card-text text-end">
+            <input class="addButton btn btn-secondary" type="button" value="Добавить"
+                   onclick="addToBasket('card{{i}}')">
+        </p>
+    </div>
+
+</div>
+<hr>
+{% endfor %}
+{% endmacro %}
+
+<!-- Макрос фильтров -->
+{% macro render_filter(filters, legenda, field) %}
+<div class="form-check" id="{{field}}">
+    <h5>{{legenda}}</h5>
+    {% for i, row in filters.iterrows() %}
+    <input class="form-check-input mt-0" type="checkbox" value="{{ row[field] }}" name="{{field}}">
+    <label for="{{field}}">{{row[field]}}</label>
+    <br>
+    {% endfor %}
+</div>
+<hr>
+{% endmacro %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link active" href={{url_for('index')}}>Каталог</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('set_schedule')}}">Установка</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('set_install')}}">Записи</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col">
+        <a class="btn btn-secondary" href="{{ url_for('new_client_get') }}">Новый клиент</a>
+    </div>
+    {{ render_combo_box(combo_box,"Клиент:", client_id, "fullname") }}
+</div>
+<div class="row">
+    <div class="col">
+        <div class="row sticky-top">
+            <form method="get" id="filtres">
+                <h5>Фильтры</h5>
+                <hr>
+                {{render_filter(producers,"Производители","producer")}}
+                {{render_filter(device_types,"Типы устройств","name")}}
+                <input class="btn btn-secondary" type="submit" value="Сброс" name=
+                        "reset">
+                <input class="btn btn-secondary" type="submit" value="Применить" name=
+                        "filter">
+            </form>
+
+        </div>
+    </div>
+    <div class="col-6"><h3 class="text-center">Каталог устройств</h3>
+
+        <div class="text-center">
+            <form method="get">
+                Поиск по названию:
+                <input type="text" id="searchName" class="input" name="itemName">
+                <button class="btn btn-secondary" type="submit">Найти</button>
+            </form>
+        </div>
+
+        <br>
+        <div id="catalog">
+            {{ render_catalog(catalog, catalog_header) }}
+        </div>
+    </div>
+    <div class="col">
+        <div class="row sticky-top">
+            <div class="col">
+                <div class="row">
+                    <h5>Корзина</h5>
+                    <hr>
+                </div>
+                <div class="row overflow-auto" id="basket" style="height: 300px; max-height: 500px">
+
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-secondary" type="button" onclick="buySystems()">Купить</button>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-secondary" type="submit" onclick="installSystems()">Установка
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function validate(e) {
+        var charCode = e.keyCode ? e.keyCode : e.charCode
+        if (!(charCode >= 48 && charCode <= 57)) {
+            if (!(charCode >= 37 && charCode <= 40))
+                if (charCode != 8 && charCode != 46)
+                    return false;
+        }
+    }
+
+    function addToBasket(product_id) {
+        let item = document.getElementById(product_id);
+        let basket = document.getElementById("basket")
+        let is_el_exist = document.getElementById('product_' + product_id);
+
+        if (!is_el_exist) {
+            let cloned_item = item.cloneNode(true);
+            let replaceBtn = cloned_item.getElementsByClassName('addButton')[0];
+            cloned_item.setAttribute('id', 'product_' + product_id);
+
+            let newElement = document.createElement('input');
+            newElement.setAttribute('type', 'number');
+            newElement.setAttribute('value', '1');
+            newElement.setAttribute('onkeydown', 'return validate(event)');
+            newElement.setAttribute('min', '0');
+            newElement.setAttribute('max', '100');
+            newElement.setAttribute('style', 'max-width:150px;');
+            newElement.addEventListener('change', (event) => {
+                if (event.target.value < 1) {
+                    let card_id = event.target.parentElement.parentElement.parentElement.id;
+                    let card = document.getElementById(card_id);
+                    card.remove();
+                }
+            });
+            // newElement.readOnly = true;
+
+            replaceBtn.replaceWith(newElement);
+
+            basket.appendChild(cloned_item);
+        }
+    }
+
+    function buySystems() {
+
+        let basket = document.getElementById("basket").getElementsByClassName("card-body");
+        let dataToSend = [];
+        if (basket.length > 0) {
+            for (let i = 0; i < basket.length; i++) {
+                let bask_dict = {};
+                let cells = basket[i].getElementsByTagName('p');
+                bask_dict['Артикул'] = parseInt(cells[0].innerText.replace("Артикул:", ""));
+                bask_dict['Количество'] = parseInt(cells[7].getElementsByTagName('input')[0].value);
+                dataToSend.push(bask_dict);
+            }
+
+            let result = confirm('Подтвердите покупку выбранных систем');
+
+            if (result) {
+                alert('Менеджер свяжется с Вами в ближайшее время!');
+                basket = document.getElementById("basket");
+
+                while (basket.firstChild) {
+                    basket.removeChild(basket.firstChild);
+                }
+
+                fetch('/buy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dataToSend),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+    }
+
+    function installSystems() {
+
+        let basket = document.getElementById("basket").getElementsByClassName("card-body");
+        let dataToSend = [];
+        if (basket.length > 0) {
+            for (let i = 0; i < basket.length; i++) {
+                let bask_dict = {};
+                let cells = basket[i].getElementsByTagName('p');
+                bask_dict['Артикул'] = parseInt(cells[0].innerText.replace("Артикул:", ""));
+                bask_dict['Количество'] = parseInt(cells[7].getElementsByTagName('input')[0].value);
+                dataToSend.push(bask_dict);
+            }
+
+
+            fetch('/schedule', {
+                method: 'POST',
+                redirect: 'follow',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+        window.location='schedule'
+    }
+
+</script>
+{% endblock %}
