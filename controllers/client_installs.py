@@ -24,7 +24,12 @@ def set_install():
     df_purcases = get_client_purcases(conn, session['client_id'])
 
     return render_template("client_installs.html",
+                           client_id=session['client_id'],
                            combo_box=df_clients,
                            title_purcases=title_purc,
                            purcases=df_purcases,
+                           pur_names=df_purcases.keys()[1:],
+                           install_names=df_installs.keys()[1:],
+                           installs=df_installs,
+                           title_installs=df_title,
                            len=len)

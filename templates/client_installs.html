@@ -3,7 +3,7 @@
 Записи
 {% endblock %}
 
-{% macro render_table(relation, titles) %}
+{% macro render_table(relation, titles, names) %}
 <thead>
 <tr>
     {% for name in titles %}
@@ -15,12 +15,11 @@
 
 {% for key,value in relation.iterrows() %}
 <tr>
+    {% for name in names%}
     <td>
-        {{ value['devices'] }}
+        {{ value[name] }}
     </td>
-        <td>
-        {{ value['status'] }}
-    </td>
+    {% endfor %}
 </tr>
 {% endfor %}
 </tbody>
@@ -29,14 +28,18 @@
 
 <!-- Макрос выпадающего списка  -->
 {% macro render_combo_box(box, header, needed_id, naming, field) %}
-<div class="col-5">
+<div class="col-5 mb-5">
     <form action="" method="get">
         {{header}}
         <select name="{{field}}">
             {% for i, row in box.iterrows() %}
-            <option value={{row[field]}} {{
-            "selected" if row[field]==needed_id else "" }}>
-            {{row[naming]}}</option>
+            {% if row[field] | int == needed_id | int %}
+            <option value="{{ row[field] }}" selected>
+                {% else %}
+            <option value="{{ row[field] }}">
+                {% endif %}
+                {{row[naming]}}
+            </option>
             {% endfor %}
         </select>
         <input class="btn btn-secondary" type="submit" value="Найти" name=
@@ -65,20 +68,24 @@
 
 {% block content %}
 <div class="row row-cols-auto">
-    <div class="col-*"></div>
+    <div class="col-2"></div>
     <div class="col-8">
         <h2>Установки</h2>
         {{ render_combo_box(combo_box,"Клиент:", client_id, "fullname", "client_id") }}
 
-        <table class="table table-striped">
+
+        <h2>Записи на установку</h2>
+        <table class="table table-striped mb-5">
+            {{render_table(installs,title_installs, install_names)}}
         </table>
 
         <h2>Статус онлайн-покупок</h2>
-        <table class="table table-striped">
-            {{render_table(purcases,title_purcases)}}
+        <table class="table table-striped mb-5">
+            {{render_table(purcases,title_purcases,pur_names)}}
         </table>
+
     </div>
-    <div class="col-*"></div>
+    <div class="col-2"></div>
 </div>
 
 {% endblock %}

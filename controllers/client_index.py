@@ -1,5 +1,7 @@
+import flask
+
 from app import app
-from flask import render_template, request, session
+from flask import render_template, request, session, redirect, url_for
 from utils import get_db_connection
 from models.client_index_model import *
 
@@ -24,11 +26,17 @@ def normalize_sql(filtred_prod, filtred_type):
     return filtred_prod, filtred_type
 
 
-@app.route('/', methods=['get'])
+@app.route('/', methods=['get', 'post'])
 def index():
     conn = get_db_connection()
     df_catalog = get_catalog(conn)
     df_clients = get_clients(conn)
+
+    if request.method == 'POST':
+        print(request.json)
+        session['data'] = request.json
+        # ! Не работает редирект
+        return redirect(url_for('set_schedule', _method='POST'), code=302)
 
     # нажата кнопка Найти
     if request.values.get('client'):
@@ -57,7 +65,6 @@ def index():
         client_is_partner = request.values.get("client_partner")
 
         session['client_id'] = create_new_client(conn, client_name, client_phone, client_is_partner)
-
     elif request.values.get('noselect'):
         a = 1
     else:

@@ -8,11 +8,11 @@ from models.client_index_model import get_clients
 @app.route('/schedule', methods=['get', 'post'])
 def set_schedule():
     conn = get_db_connection()
-
     if request.method == 'POST':
-        session['data'] = request.json
-        # ! посчитать общее время на установку
-        print(session['data'])
+        date_dict = request.json
+        # print(date_dict, session['client_id'], session['data'])
+        enroll_install(conn, date_dict, session['client_id'], session['data'])
+        return redirect(url_for('index'))
 
     if request.values.get('fullname'):
         client_id = request.values.get('client_id')
@@ -29,6 +29,8 @@ def set_schedule():
     df_dates = get_dates(conn)
 
     return render_template("client_schedule.html",
+                           client_id=session['client_id'],
+                           box_id=session['box_id'],
                            combo_box=df_clients,
                            boxes=df_boxes,
                            schedule=df_schedule,

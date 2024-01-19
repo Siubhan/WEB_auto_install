@@ -11,13 +11,16 @@
         {{header}}
         <select name="{{field}}">
             {% for i, row in box.iterrows() %}
-            <option value={{row[field]}} {{
-            "selected" if row[field]==needed_id else "" }}>
-            {{row[naming]}}</option>
+            {% if row[field] | int == needed_id | int %}
+            <option value="{{ row[field] }}" selected>
+                {% else %}
+            <option value="{{ row[field] }}">
+                {% endif %}
+                {{row[naming]}}
+            </option>
             {% endfor %}
         </select>
-        <input class="btn btn-secondary" type="submit" value="Найти" name=
-                "{{naming}}">
+        <input class="btn btn-secondary" type="submit" value="Найти" name="{{ naming }}">
     </form>
 </div>
 {% endmacro %}
@@ -29,9 +32,10 @@
     <div class="row"><h5>{{row["schedule_date"]}}</h5></div>
     {% for i, sched in schedule.iterrows() if sched["schedule_date"] == row["schedule_date"] %}
     <div class="row">
-        <button id="{{sched['schedule_id']}}" class="btn btn-outline-secondary mb-1" {{'disabled' if sched['is_free']==0 else '' }}
-        onclick="selectTime({{sched['schedule_id']}})">
-            {{sched["work_hour"]}}
+        <button id="{{sched['schedule_id']}}" class="btn btn-outline-secondary mb-1"
+                onclick="selectTime({{ sched['schedule_id'] }})" {{
+        'disabled' if sched['is_free']==0 else '' }} >
+        {{ sched["work_hour"] }}
         </button>
     </div>
     {% endfor %}
@@ -65,7 +69,7 @@
         <a class="btn btn-secondary" href="{{ url_for('new_client_get') }}">Новый клиент</a>
     </div>
     {{ render_combo_box(combo_box,"Клиент:", client_id, "fullname", "client_id") }}
-    {{ render_combo_box(boxes,"Боксы:", 1, "address", "box_id") }}
+    {{ render_combo_box(boxes,"Боксы:", box_id, "address", "box_id") }}
 </div>
 <div class="row justify-content-between">
     {{ render_schedule(schedule,dates) }}
@@ -75,8 +79,28 @@
 {% block script %}
 <script>
     function selectTime(buttonId) {
-        // ! ЗАПИСЬ НА УСТАНОВКУ
-        console.log(buttonId);
+        let result = confirm('Подтвердите запись на выбранное время');
+
+        if (result) {
+            alert('Вы записаны!');
+            let dataToSend = {'id': buttonId};
+
+            fetch('/schedule', {
+                method: 'POST',
+                redirect: 'follow',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
     }
 
 </script>

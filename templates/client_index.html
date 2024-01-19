@@ -10,9 +10,13 @@
     {{header}}
     <select name="client_id">
         {% for i, row in box.iterrows() %}
-        <option value={{row["client_id"]}} {{
-        "selected" if row["client_id"]==needed_id else "" }}>
-        {{row["fullname"]}}</option>
+        {% if row["client_id"] | int == needed_id | int %}
+        <option value="{{ row['client_id'] }}" selected>
+            {% else %}
+        <option value="{{ row['client_id'] }}">
+            {% endif %}
+            {{row["fullname"]}}
+        </option>
         {% endfor %}
     </select>
     <input class="btn btn-secondary" type="submit" value="Найти" name=
@@ -204,6 +208,7 @@
 
                 fetch('/buy', {
                     method: 'POST',
+                    redirect: 'follow',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -234,7 +239,7 @@
             }
 
 
-            fetch('/schedule', {
+            fetch('/', {
                 method: 'POST',
                 redirect: 'follow',
                 headers: {
@@ -249,8 +254,8 @@
                 .catch((error) => {
                     console.error('Error:', error);
                 });
+            alert('Корзина записана, перейдите на вкладку установка');
         }
-        window.location='schedule'
     }
 
 </script>
