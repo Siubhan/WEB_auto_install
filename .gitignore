@@ -5,3 +5,4 @@ venv/*
 controllers/__pycache__/client_schedule.cpython-310.pyc
 models/__pycache__/installer_schedule_model.cpython-310.pyc
 *.pyc
+*.pyc

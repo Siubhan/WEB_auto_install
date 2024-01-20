@@ -10,8 +10,9 @@ def set_schedule():
     conn = get_db_connection()
     if request.method == 'POST':
         date_dict = request.json
-        # print(date_dict, session['client_id'], session['data'])
+        print(date_dict, session['client_id'], session['data'])
         enroll_install(conn, date_dict, session['client_id'], session['data'])
+
         return redirect(url_for('index'))
 
     if request.values.get('fullname'):

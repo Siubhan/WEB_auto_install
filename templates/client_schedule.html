@@ -78,6 +78,7 @@
 
 {% block script %}
 <script>
+    // Есть тег <modal>
     function selectTime(buttonId) {
         let result = confirm('Подтвердите запись на выбранное время');
 
@@ -100,6 +101,7 @@
                 .catch((error) => {
                     console.error('Error:', error);
                 });
+            location.assign('/');
         }
     }
 

@@ -35,8 +35,8 @@ def index():
     if request.method == 'POST':
         print(request.json)
         session['data'] = request.json
-        # ! Не работает редирект
-        return redirect(url_for('set_schedule', _method='POST'), code=302)
+
+        return redirect(url_for('set_schedule'), code=302)
 
     # нажата кнопка Найти
     if request.values.get('client'):

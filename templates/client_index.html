@@ -226,7 +226,7 @@
     }
 
     function installSystems() {
-
+        // Есть тег <modal>
         let basket = document.getElementById("basket").getElementsByClassName("card-body");
         let dataToSend = [];
         if (basket.length > 0) {
@@ -239,7 +239,7 @@
             }
 
 
-            fetch('/', {
+            let request = fetch('/', {
                 method: 'POST',
                 redirect: 'follow',
                 headers: {
@@ -254,7 +254,7 @@
                 .catch((error) => {
                     console.error('Error:', error);
                 });
-            alert('Корзина записана, перейдите на вкладку установка');
+            location.assign('/schedule');
         }
     }
 
